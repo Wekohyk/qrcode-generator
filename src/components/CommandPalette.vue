@@ -89,7 +89,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 <template>
   <div
     v-if="open"
-    class="fixed inset-0 z-40 flex items-start justify-center bg-[rgba(0,0,0,0.55)] px-16px pt-[15vh]"
+    class="fixed inset-0 z-40 flex items-start justify-center bg-[rgba(26,46,36,0.28)] px-16px pt-[15vh]"
     @click.self="close"
   >
     <div class="panel w-full max-w-520px overflow-hidden">

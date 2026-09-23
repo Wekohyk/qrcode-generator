@@ -40,7 +40,7 @@ onMounted(() => {
     class="page flex min-h-screen items-center justify-center px-20px py-32px"
   >
     <article class="panel w-full max-w-420px px-24px py-24px">
-      <p class="text-12px text-text-muted">墨码</p>
+      <p class="text-12px text-text-muted">Weko QR Code</p>
       <template v-if="!code">
         <h1 class="mt-12px text-20px font-semibold">这个码不存在</h1>
         <p class="mt-8px text-14px text-text-secondary">它可能已经删除。</p>
@@ -57,7 +57,7 @@ onMounted(() => {
         <a
           v-if="url"
           :href="url"
-          class="mt-16px inline-flex h-36px items-center rounded-8px bg-accent px-14px text-14px font-medium text-bg-base"
+          class="mt-16px inline-flex h-36px items-center rounded-12px bg-accent px-14px text-14px font-medium text-white"
         >
           打开链接
         </a>

@@ -1,0 +1,12 @@
+name = "weko-qr-live"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "weko-qr"
+database_id = "00000000-0000-0000-0000-000000000000" # replace after: wrangler d1 create weko-qr
+
+# Optional: bind a custom domain for short links, e.g. q.example.com
+# routes = [{ pattern = "q.example.com/*", zone_name = "example.com" }]

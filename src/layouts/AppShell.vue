@@ -18,7 +18,7 @@ const nav = [
   { to: '/settings', label: '设置', icon: 'settings' },
 ] as const;
 
-const crumb = computed(() => route.meta.title || '墨码');
+const crumb = computed(() => route.meta.title || 'Weko QR Code');
 
 function active(path: string) {
   if (path === '/') return route.path === '/';
@@ -37,26 +37,30 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden bg-bg-base text-text-primary">
+  <div class="page flex h-screen overflow-hidden">
     <aside
-      class="flex shrink-0 flex-col overflow-hidden border-r border-border-subtle bg-bg-raised transition-[width] duration-200"
+      class="flex shrink-0 flex-col overflow-hidden border-r border-border-subtle bg-bg-raised shadow-[8px_0_32px_rgba(36,90,58,0.05)] backdrop-blur-xl transition-[width] duration-200"
       :class="settings.sidebarCollapsed ? 'w-56px' : 'w-220px'"
     >
       <div
         class="flex h-56px items-center gap-10px border-b border-border-subtle"
         :class="settings.sidebarCollapsed ? 'justify-center px-0' : 'px-16px'"
       >
-        <span
-          class="grid h-16px w-16px shrink-0 grid-cols-2 gap-2px"
+        <svg
+          viewBox="0 0 24 24"
+          class="h-18px w-18px shrink-0 text-accent"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
           aria-hidden="true"
         >
-          <i class="bg-text-primary" />
-          <i class="bg-text-primary" />
-          <i class="bg-accent" />
-          <i class="bg-text-primary" />
-        </span>
+          <path
+            d="M12 21c4-3 7-6.5 7-10.5A6.5 6.5 0 0 0 6 8c0 1.2.4 2.4 1 3.4C5.2 12 4 13.6 4 15.5 4 18.5 7.5 21 12 21z"
+          />
+          <path d="M12 21V10" />
+        </svg>
         <span v-if="!settings.sidebarCollapsed" class="text-16px font-semibold">
-          墨码
+          Weko
         </span>
       </div>
       <nav class="flex-1 py-12px">
@@ -65,7 +69,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
           :key="item.to"
           :to="item.to"
           :title="item.label"
-          class="mx-8px mb-4px flex h-40px items-center gap-10px rounded-8px text-14px text-text-secondary transition-colors duration-150 hover:bg-bg-overlay hover:text-text-primary"
+          class="mx-8px mb-4px flex h-40px items-center gap-10px rounded-12px text-14px text-text-secondary transition-colors duration-200 hover:bg-bg-mist hover:text-text-primary"
           :class="[
             settings.sidebarCollapsed ? 'justify-center px-0' : 'px-10px',
             active(item.to) &&
@@ -78,7 +82,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
       </nav>
       <button
         type="button"
-        class="mx-8px mb-12px flex h-36px items-center rounded-8px text-12px text-text-muted hover:bg-bg-overlay hover:text-text-secondary"
+        class="mx-8px mb-12px flex h-36px items-center rounded-12px text-12px text-text-muted hover:bg-bg-mist hover:text-text-secondary"
         :class="settings.sidebarCollapsed ? 'justify-center' : 'px-10px'"
         @click="settings.sidebarCollapsed = !settings.sidebarCollapsed"
       >
@@ -92,7 +96,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
         <p class="truncate text-14px text-text-secondary">{{ crumb }}</p>
         <button
           type="button"
-          class="flex items-center gap-8px rounded-8px border border-border-subtle bg-bg-raised px-10px py-6px text-12px text-text-muted hover:border-border-strong hover:text-text-secondary"
+          class="flex items-center gap-8px rounded-12px border border-border-subtle bg-white/60 px-10px py-6px text-12px text-text-muted backdrop-blur-xl hover:border-border-strong hover:text-text-secondary"
           @click="paletteOpen = true"
         >
           <Icon name="search" />

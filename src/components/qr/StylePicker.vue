@@ -63,13 +63,13 @@ function useBrand() {
         type="button"
         class="chip"
         :class="
-          modelValue.module === 'cyan'
+          modelValue.module !== 'classic'
             ? 'border-accent bg-accent-muted text-accent'
             : 'border-border-subtle text-text-secondary'
         "
-        @click="patch({ module: 'cyan' })"
+        @click="patch({ module: 'emerald' })"
       >
-        青模块
+        翠绿模块
       </button>
     </div>
     <label class="mb-14px block">
@@ -85,7 +85,7 @@ function useBrand() {
         min="1"
         max="4"
         step="1"
-        class="w-full accent-[#22D3EE]"
+        class="w-full accent-[#2F9B6A]"
         @input="
           patch({ margin: Number(($event.target as HTMLInputElement).value) })
         "

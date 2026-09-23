@@ -35,7 +35,7 @@ watch(
 <template>
   <div
     :key="`${text}:${style.module}:${style.logo}:${style.ecc}:${style.margin}`"
-    class="ink-in flex flex-col items-center"
+    class="glass-in flex flex-col items-center"
   >
     <div
       class="flex h-252px w-252px items-center justify-center rounded-12px bg-white"
@@ -45,10 +45,10 @@ watch(
         ref="canvasRef"
         class="h-220px w-220px"
       />
-      <p v-if="empty" class="px-24px text-center text-12px text-[#5A6A7D]">
+      <p v-if="empty" class="px-24px text-center text-12px text-[#5A7264]">
         填写内容后生成预览
       </p>
-      <p v-else-if="error" class="px-24px text-center text-12px text-[#F87171]">
+      <p v-else-if="error" class="px-24px text-center text-12px text-[#D46565]">
         {{ error }}
       </p>
     </div>

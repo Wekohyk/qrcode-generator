@@ -63,7 +63,7 @@ const router = createRouter({
 
 router.afterEach(to => {
   const title = typeof to.meta.title === 'string' ? to.meta.title : '';
-  document.title = title ? `${title} · 墨码` : '墨码';
+  document.title = title ? `${title} · Weko QR Code` : 'Weko QR Code';
 });
 
 export default router;

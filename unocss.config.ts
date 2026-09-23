@@ -18,35 +18,43 @@ export default defineConfig({
   theme: {
     colors: {
       bg: {
-        base: '#0B0F14',
-        raised: '#12181F',
-        overlay: '#1A222D',
+        base: '#E8F0E9',
+        mist: '#F4F8F4',
+        raised: 'rgba(255,255,255,0.62)',
+        overlay: 'rgba(255,255,255,0.78)',
       },
       border: {
-        subtle: '#1E2630',
-        strong: '#2A3441',
+        subtle: 'rgba(36, 90, 58, 0.12)',
+        strong: 'rgba(36, 90, 58, 0.22)',
+        glass: 'rgba(255,255,255,0.55)',
       },
       text: {
-        primary: '#E8EEF5',
-        secondary: '#8B9BB0',
-        muted: '#5A6A7D',
+        primary: '#1A2E24',
+        secondary: '#5A7264',
+        muted: '#8AA093',
       },
       accent: {
-        DEFAULT: '#22D3EE',
-        hover: '#67E8F9',
-        muted: 'rgba(34,211,238,0.12)',
+        DEFAULT: '#2F9B6A',
+        hover: '#3CB87E',
+        deep: '#1F6B48',
+        muted: 'rgba(47,155,106,0.14)',
+        soft: '#A8D5B5',
       },
-      success: '#34D399',
-      warning: '#FBBF24',
-      danger: '#F87171',
+      ornament: {
+        gold: '#C4A574',
+      },
+      success: '#2F9B6A',
+      warning: '#D4A017',
+      danger: '#D46565',
     },
   },
   shortcuts: {
     page: 'min-h-screen bg-bg-base text-text-primary',
-    panel: 'bg-bg-raised border border-border-subtle rounded-12px',
+    panel:
+      'bg-bg-raised border border-border-glass backdrop-blur-xl rounded-20px shadow-[0_8px_32px_rgba(36,90,58,0.08)]',
     field:
-      'w-full border border-border-subtle rounded-8px bg-bg-raised px-12px py-8px text-14px text-text-primary outline-none transition-colors duration-150 focus:border-accent placeholder:text-text-muted disabled:opacity-40',
-    chip: 'rounded-8px border px-10px py-6px text-12px transition-colors duration-150',
+      'w-full border border-border-subtle rounded-12px bg-white/70 px-12px py-8px text-14px text-text-primary outline-none transition-colors duration-200 focus:border-accent focus:shadow-[0_0_0_2px_rgba(47,155,106,0.22)] placeholder:text-text-muted disabled:opacity-40',
+    chip: 'rounded-12px border px-10px py-6px text-12px transition-colors duration-200',
   },
   presets: [
     presetWind(),

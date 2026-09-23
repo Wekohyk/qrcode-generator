@@ -8,7 +8,7 @@ function escapeMecard(value: string) {
   return value.trim().replace(/([\\;:])/g, '\\$1');
 }
 
-function httpUrl(raw: string) {
+export function httpUrl(raw: string) {
   const value = raw.trim();
   if (!value) return '';
   const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`;
@@ -54,18 +54,14 @@ export function buildStaticPayload(kind: QrKind, fields: QrFields) {
     .join('\n');
 }
 
-export function liveAddress(id: string) {
-  return `${location.origin}/v/${id}`;
-}
-
 export function previewPayload(input: {
-  id?: string;
+  scanUrl?: string;
   kind: QrKind;
   mode: QrMode;
   fields: QrFields;
 }) {
   const live = input.kind === 'rich' || input.mode === 'live';
-  if (live && input.id) return liveAddress(input.id);
+  if (live) return input.scanUrl || '';
   return buildStaticPayload(input.kind, input.fields);
 }
 

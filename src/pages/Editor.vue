@@ -12,12 +12,19 @@ import {
   type QrDraft,
   type QrKind,
 } from '@/types/code';
-import { contentError, liveAddress, previewPayload } from '@/utils/payload';
+import { contentError, previewPayload } from '@/utils/payload';
+import {
+  createLiveCode,
+  patchLiveCode,
+  toLivePayload,
+  toLiveType,
+} from '@/api/live';
 import { downloadQr } from '@/composables/useQr';
 import { readImageFile } from '@/utils/image';
 import AppButton from '@/components/ui/AppButton.vue';
 import EmptyState from '@/components/ui/EmptyState.vue';
 import Field from '@/components/ui/Field.vue';
+import ArtFrame from '@/components/ornament/ArtFrame.vue';
 import Preview from '@/components/qr/Preview.vue';
 import StylePicker from '@/components/qr/StylePicker.vue';
 import TypeTabs from '@/components/qr/TypeTabs.vue';
@@ -50,7 +57,9 @@ const current = computed(() =>
 
 const payload = computed(() =>
   previewPayload({
-    id: savedId.value || undefined,
+    scanUrl: isLive(draft.value.kind, draft.value.mode)
+      ? current.value?.scanUrl
+      : undefined,
     kind: draft.value.kind,
     mode: draft.value.kind === 'rich' ? 'live' : draft.value.mode,
     fields: draft.value.fields,
@@ -58,11 +67,11 @@ const payload = computed(() =>
 );
 
 const showLiveAddress = computed(
-  () => Boolean(savedId.value) && isLive(draft.value.kind, draft.value.mode),
+  () =>
+    Boolean(current.value?.scanUrl) &&
+    isLive(draft.value.kind, draft.value.mode),
 );
-const liveFixed = computed(
-  () => showLiveAddress.value && current.value?.mode === 'live',
-);
+const liveFixed = computed(() => showLiveAddress.value);
 
 function applyRoute() {
   missing.value = false;
@@ -142,11 +151,42 @@ async function save() {
     fields: { ...draft.value.fields },
     style: { ...draft.value.style },
   };
+  let link = current.value?.remoteId
+    ? {
+        remoteId: current.value.remoteId,
+        shortKey: current.value.shortKey || '',
+        scanUrl: current.value.scanUrl || '',
+      }
+    : undefined;
+  if (isLive(next.kind, next.mode)) {
+    const body = {
+      type: toLiveType(next.kind),
+      title: next.name.trim(),
+      payload: toLivePayload(next.kind, next.fields),
+    };
+    try {
+      if (link?.remoteId) {
+        await patchLiveCode(link.remoteId, body);
+      } else {
+        const created = await createLiveCode(body);
+        link = {
+          remoteId: created.id,
+          shortKey: created.short_key,
+          scanUrl: created.scan_url,
+        };
+      }
+    } catch (reason) {
+      error.value =
+        reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+      savedHint.value = false;
+      return;
+    }
+  }
   if (!savedId.value) {
-    const created = codes.create(next);
+    const created = codes.create(next, link);
     await router.replace({ name: 'code-edit', params: { id: created.id } });
   } else {
-    codes.update(savedId.value, next);
+    codes.update(savedId.value, next, link);
   }
   savedHint.value = true;
   window.setTimeout(() => {
@@ -163,7 +203,7 @@ async function download() {
     const ok = await downloadQr(
       payload.value,
       draft.value.style,
-      draft.value.name.trim() || 'inkcode',
+      draft.value.name.trim() || 'weko-qr',
     );
     if (!ok) error.value = '下载失败';
   } catch {
@@ -172,7 +212,7 @@ async function download() {
 }
 
 async function copyAddress() {
-  const address = savedId.value ? liveAddress(savedId.value) : '';
+  const address = current.value?.scanUrl || '';
   if (!address) return;
   try {
     await navigator.clipboard.writeText(address);
@@ -185,12 +225,17 @@ async function copyAddress() {
   }
 }
 
-function togglePause() {
+async function togglePause() {
   if (!current.value || current.value.mode !== 'live') return;
-  codes.setStatus(
-    [current.value.id],
-    current.value.status === 'paused' ? 'active' : 'paused',
-  );
+  try {
+    await codes.setStatus(
+      [current.value.id],
+      current.value.status === 'paused' ? 'active' : 'paused',
+    );
+  } catch (reason) {
+    error.value =
+      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+  }
 }
 </script>
 
@@ -212,8 +257,9 @@ function togglePause() {
     </aside>
     <section class="flex items-center justify-center px-24px py-28px">
       <div
-        class="panel flex w-full max-w-360px flex-col items-center px-28px py-28px"
+        class="panel relative flex w-full max-w-360px flex-col items-center px-28px py-28px"
       >
+        <ArtFrame />
         <Preview :text="payload" :style="draft.style" />
         <p
           class="mt-16px max-w-280px break-all text-center text-12px text-text-muted"
@@ -227,11 +273,13 @@ function togglePause() {
           v-else-if="isLive(draft.kind, draft.mode)"
           class="mt-8px text-center text-12px text-warning"
         >
-          保存后二维码会改成固定地址，请再下载一次
+          保存后会生成固定短链，请再下载一次
         </p>
       </div>
     </section>
-    <aside class="flex flex-col border-border-subtle xl:min-h-0 xl:border-l">
+    <aside
+      class="flex flex-col border-border-subtle bg-bg-raised backdrop-blur-xl xl:min-h-0 xl:border-l"
+    >
       <div class="xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
         <section class="border-b border-border-subtle px-20px py-16px">
           <div class="mb-12px flex items-center justify-between">
@@ -320,7 +368,7 @@ function togglePause() {
               <input
                 v-model="draft.fields.hidden"
                 type="checkbox"
-                class="accent-[#22D3EE]"
+                class="accent-[#2F9B6A]"
               />
               隐藏网络
             </label>
@@ -378,7 +426,7 @@ function togglePause() {
             v-if="draft.kind === 'rich'"
             class="text-12px text-text-secondary"
           >
-            图文保存在墨码里。二维码只含固定地址，改内容不用换图。
+            图文保存在短链后面。二维码只含固定地址，改内容不用换图。
           </div>
           <div v-else>
             <div class="mb-8px flex gap-8px">
@@ -425,7 +473,7 @@ function togglePause() {
           </div>
         </section>
       </div>
-      <div class="border-t border-border-subtle bg-bg-base px-20px py-12px">
+      <div class="border-t border-border-subtle px-20px py-12px">
         <p v-if="error" class="mb-8px text-12px text-danger">{{ error }}</p>
         <p v-else-if="savedHint" class="mb-8px text-12px text-success">
           已保存

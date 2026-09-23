@@ -20,7 +20,7 @@ function payload(id: string) {
   const code = codes.items.find(item => item.id === id);
   if (!code) return '';
   return previewPayload({
-    id: code.id,
+    scanUrl: code.scanUrl,
     kind: code.kind,
     mode: code.mode,
     fields: code.fields,
@@ -75,7 +75,7 @@ function payload(id: string) {
           v-for="item in recent"
           :key="item.id"
           :to="`/codes/${item.id}`"
-          class="flex h-60px items-center gap-12px border-b border-border-subtle px-16px last:border-b-0 hover:bg-bg-overlay"
+          class="flex h-60px items-center gap-12px border-b border-border-subtle px-16px last:border-b-0 hover:bg-bg-mist"
         >
           <QrThumb :text="payload(item.id)" :style="item.style" />
           <span class="min-w-0 flex-1">

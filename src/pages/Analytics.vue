@@ -1,18 +1,56 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { fetchLiveStats } from '@/api/live';
 import { useCodesStore } from '@/store/modules/codes';
 import type { ScanSource } from '@/types/code';
 
 const codes = useCodesStore();
 const day = 86_400_000;
+const remoteTotal = ref(0);
+const remoteEvents = ref<{ at: number; source: ScanSource }[]>([]);
+
+function sourceOf(ua: string | null): ScanSource {
+  const agent = (ua || '').toLowerCase();
+  if (agent.includes('micromessenger')) return 'wechat';
+  return 'direct';
+}
+
+onMounted(async () => {
+  const events: { at: number; source: ScanSource }[] = [];
+  let total = 0;
+  await Promise.all(
+    codes.items
+      .filter(item => item.remoteId)
+      .map(async item => {
+        try {
+          const stats = await fetchLiveStats(item.remoteId || '');
+          total += stats.total;
+          stats.recent.forEach(row => {
+            const at = Date.parse(`${row.ts.replace(' ', 'T')}Z`);
+            events.push({
+              at: Number.isNaN(at) ? Date.now() : at,
+              source: sourceOf(row.ua),
+            });
+          });
+        } catch {
+          return;
+        }
+      }),
+  );
+  remoteTotal.value = total;
+  remoteEvents.value = events;
+});
+
+const localScans = computed(() =>
+  codes.items.filter(item => !item.remoteId).flatMap(item => item.scans),
+);
 
 const summary = computed(() => {
   const live = codes.items.filter(item => item.mode === 'live').length;
-  const scans = codes.items.reduce((sum, item) => sum + item.scans.length, 0);
   return [
     { label: '全部码', value: codes.items.length },
     { label: '活码', value: live },
-    { label: '累计打开', value: scans },
+    { label: '累计打开', value: remoteTotal.value + localScans.value.length },
   ];
 });
 
@@ -28,13 +66,11 @@ const days = computed(() => {
       count: 0,
     };
   });
-  codes.items.forEach(item => {
-    item.scans.forEach(scan => {
-      if (scan.at < start) return;
-      const index = Math.floor((scan.at - start) / day);
-      const bucket = buckets[index];
-      if (bucket) bucket.count += 1;
-    });
+  [...localScans.value, ...remoteEvents.value].forEach(scan => {
+    if (scan.at < start) return;
+    const index = Math.floor((scan.at - start) / day);
+    const bucket = buckets[index];
+    if (bucket) bucket.count += 1;
   });
   const max = Math.max(...buckets.map(item => item.count), 1);
   return buckets.map(item => ({
@@ -49,10 +85,8 @@ const weekTotal = computed(() =>
 
 const sources = computed(() => {
   const tally: Record<ScanSource, number> = { direct: 0, wechat: 0, other: 0 };
-  codes.items.forEach(item => {
-    item.scans.forEach(scan => {
-      tally[scan.source] += 1;
-    });
+  [...localScans.value, ...remoteEvents.value].forEach(scan => {
+    tally[scan.source] += 1;
   });
   const total = tally.direct + tally.wechat + tally.other;
   return [
@@ -70,7 +104,7 @@ const sources = computed(() => {
   <div class="h-full overflow-y-auto px-24px py-20px">
     <h1 class="text-20px font-semibold">数据</h1>
     <p class="mt-6px max-w-520px text-14px text-text-secondary">
-      活码被打开后记在这里。静态码不经过墨码，没有扫码数。
+      活码打开次数来自短链服务。静态码不经过短链，没有扫码数。
     </p>
     <div class="mt-20px grid gap-12px sm:grid-cols-3">
       <div

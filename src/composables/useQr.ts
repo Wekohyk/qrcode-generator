@@ -1,10 +1,9 @@
 import QRCode from 'qrcode';
 import type { QrStyle } from '@/types/code';
 
-const moduleColor: Record<QrStyle['module'], string> = {
-  classic: '#14181F',
-  cyan: '#0E7490',
-};
+function moduleInk(module: string) {
+  return module === 'classic' ? '#14181F' : '#1F6B48';
+}
 
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -41,7 +40,7 @@ export async function paintQr(
     margin: style.margin,
     width,
     color: {
-      dark: moduleColor[style.module],
+      dark: moduleInk(style.module),
       light: '#FFFFFF',
     },
   });

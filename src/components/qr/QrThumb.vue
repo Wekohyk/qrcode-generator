@@ -27,7 +27,7 @@ watch(
 
 <template>
   <div
-    class="h-40px w-40px overflow-hidden rounded-4px border border-border-subtle bg-white"
+    class="h-40px w-40px overflow-hidden rounded-8px border border-accent-soft bg-white"
   >
     <canvas v-if="text" ref="canvasRef" class="h-40px w-40px" />
   </div>

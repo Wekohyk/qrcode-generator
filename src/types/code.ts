@@ -1,7 +1,7 @@
 export type QrKind = 'url' | 'text' | 'vcard' | 'wifi' | 'rich';
 export type QrMode = 'static' | 'live';
 export type QrStatus = 'active' | 'static' | 'paused';
-export type ModuleStyle = 'classic' | 'cyan';
+export type ModuleStyle = 'classic' | 'emerald';
 export type EccLevel = 'L' | 'M' | 'Q' | 'H';
 export type WifiEncryption = 'WPA' | 'WEP' | 'nopass';
 export type ScanSource = 'direct' | 'wechat' | 'other';
@@ -44,6 +44,9 @@ export interface QrCode {
   status: QrStatus;
   fields: QrFields;
   style: QrStyle;
+  remoteId?: string;
+  shortKey?: string;
+  scanUrl?: string;
   createdAt: number;
   updatedAt: number;
   scans: ScanEvent[];
@@ -77,11 +80,11 @@ export const styleTemplates = [
     },
   },
   {
-    id: 'cyan',
-    name: '青印',
-    description: '深青模块，对比度仍然够扫。',
+    id: 'emerald',
+    name: '翠绿',
+    description: '深翠模块，对比度仍然够扫。',
     style: {
-      module: 'cyan',
+      module: 'emerald',
       margin: 2,
       ecc: 'M',
       logo: '',
@@ -139,7 +142,8 @@ export function parseKind(value: unknown): QrKind {
 }
 
 export function styleFromTemplate(id: unknown, brandLogo = ''): QrStyle {
-  const found = styleTemplates.find(item => item.id === id);
+  const key = id === 'cyan' ? 'emerald' : id;
+  const found = styleTemplates.find(item => item.id === key);
   const style: QrStyle = found ? { ...found.style } : defaultStyle();
   if (found?.id === 'mark' && brandLogo) style.logo = brandLogo;
   return style;

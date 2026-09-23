@@ -1,20 +1,26 @@
 :root {
-  color-scheme: dark;
-  --bg-base: #0b0f14;
-  --bg-raised: #12181f;
-  --bg-overlay: #1a222d;
-  --border-subtle: #1e2630;
-  --border-strong: #2a3441;
-  --text-primary: #e8eef5;
-  --text-secondary: #8b9bb0;
-  --text-muted: #5a6a7d;
-  --accent: #22d3ee;
-  --accent-hover: #67e8f9;
-  --accent-muted: rgba(34, 211, 238, 0.12);
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
+  color-scheme: light;
+  --bg-base: #e8f0e9;
+  --bg-mist: #f4f8f4;
+  --bg-raised: rgba(255, 255, 255, 0.62);
+  --bg-overlay: rgba(255, 255, 255, 0.78);
+  --border-subtle: rgba(36, 90, 58, 0.12);
+  --border-strong: rgba(36, 90, 58, 0.22);
+  --border-glass: rgba(255, 255, 255, 0.55);
+  --text-primary: #1a2e24;
+  --text-secondary: #5a7264;
+  --text-muted: #8aa093;
+  --accent: #2f9b6a;
+  --accent-hover: #3cb87e;
+  --accent-deep: #1f6b48;
+  --accent-muted: rgba(47, 155, 106, 0.14);
+  --accent-soft: #a8d5b5;
+  --ornament-gold: #c4a574;
+  --success: #2f9b6a;
+  --warning: #d4a017;
+  --danger: #d46565;
   --font: Inter, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+  --glass-shadow: 0 8px 32px rgba(36, 90, 58, 0.08);
 }
 
 html,
@@ -26,7 +32,18 @@ body,
 body {
   font-family: var(--font);
   font-weight: 400;
-  background: var(--bg-base);
+  background-color: var(--bg-base);
+  background-image:
+    radial-gradient(
+      520px 320px at 100% 100%,
+      rgba(168, 213, 181, 0.55),
+      transparent 70%
+    ),
+    radial-gradient(
+      420px 280px at 0% 0%,
+      rgba(255, 255, 255, 0.85),
+      transparent 65%
+    );
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
 }
@@ -39,19 +56,21 @@ select {
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.28);
+  background: rgba(47, 155, 106, 0.22);
   color: var(--text-primary);
 }
 
-@keyframes ink-in {
+@keyframes glass-in {
   from {
     opacity: 0;
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
+    transform: none;
   }
 }
 
-.ink-in {
-  animation: ink-in 180ms ease;
+.glass-in {
+  animation: glass-in 200ms ease-out;
 }

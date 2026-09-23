@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
+import { fetchLiveStats } from '@/api/live';
 import { useCodesStore } from '@/store/modules/codes';
 import { kindMeta, statusMeta, type QrCode } from '@/types/code';
 import { previewPayload } from '@/utils/payload';
@@ -15,6 +16,25 @@ const keyword = ref('');
 const filter = ref<'all' | 'live' | 'static' | 'paused'>('all');
 const selected = ref<string[]>([]);
 const notice = ref('');
+const remoteCounts = ref<Record<string, number>>({});
+
+onMounted(async () => {
+  await Promise.all(
+    codes.items
+      .filter(item => item.remoteId)
+      .map(async item => {
+        try {
+          const stats = await fetchLiveStats(item.remoteId || '');
+          remoteCounts.value = {
+            ...remoteCounts.value,
+            [item.id]: stats.total,
+          };
+        } catch {
+          return;
+        }
+      }),
+  );
+});
 
 const filters = [
   { id: 'all', label: '全部' },
@@ -57,7 +77,7 @@ function toggle(id: string) {
 
 function payloadOf(item: QrCode) {
   return previewPayload({
-    id: item.id,
+    scanUrl: item.scanUrl,
     kind: item.kind,
     mode: item.mode,
     fields: item.fields,
@@ -70,29 +90,39 @@ function liveIds() {
   );
 }
 
-function pause() {
+async function pause() {
   const ids = liveIds();
   if (!ids.length) {
     notice.value = '静态码不能暂停';
     return;
   }
-  codes.setStatus(ids, 'paused');
-  notice.value = '';
+  try {
+    await codes.setStatus(ids, 'paused');
+    notice.value = '';
+  } catch (reason) {
+    notice.value =
+      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+  }
 }
 
-function resume() {
+async function resume() {
   const ids = liveIds();
   if (!ids.length) {
     notice.value = '静态码没有暂停状态';
     return;
   }
-  codes.setStatus(ids, 'active');
-  notice.value = '';
+  try {
+    await codes.setStatus(ids, 'active');
+    notice.value = '';
+  } catch (reason) {
+    notice.value =
+      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+  }
 }
 
-function remove() {
+async function remove() {
   if (!window.confirm(`删除选中的 ${selected.value.length} 个码？`)) return;
-  codes.remove(selected.value);
+  await codes.remove(selected.value);
   selected.value = [];
   notice.value = '';
 }
@@ -156,7 +186,7 @@ function remove() {
           <input
             :checked="allChecked"
             type="checkbox"
-            class="accent-[#22D3EE]"
+            class="accent-[#2F9B6A]"
             @change="toggleAll"
           />
           <span />
@@ -175,12 +205,12 @@ function remove() {
           v-for="item in filtered"
           :key="item.id"
           :class="cols"
-          class="h-60px border-b border-border-subtle last:border-b-0"
+          class="h-60px border-b border-border-subtle last:border-b-0 hover:bg-bg-mist"
         >
           <input
             :checked="selected.includes(item.id)"
             type="checkbox"
-            class="accent-[#22D3EE]"
+            class="accent-[#2F9B6A]"
             @change="toggle(item.id)"
           />
           <QrThumb :text="payloadOf(item)" :style="item.style" />
@@ -205,7 +235,7 @@ function remove() {
             {{ statusMeta(item.status).label }}
           </span>
           <span class="text-12px text-text-secondary">
-            {{ item.scans.length }}
+            {{ remoteCounts[item.id] ?? item.scans.length }}
           </span>
           <span class="text-12px text-text-muted">
             {{ dayjs(item.updatedAt).format('MM-DD HH:mm') }}
