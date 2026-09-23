@@ -46,4 +46,4 @@ curl -X PATCH http://127.0.0.1:8787/api/codes/<id> \
 
 - `/api/*` 必须鉴权
 - IP 写入前会做 SHA-256，只存截断后的 `ip_hash`
-- 短链用独立子域（如 `q.example.com`），与 Pages 管理后台分离
+- 短链用独立子域（如 `q.example.com`），与 views 管理后台分离
