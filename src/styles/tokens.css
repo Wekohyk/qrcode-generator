@@ -1,0 +1,57 @@
+:root {
+  color-scheme: dark;
+  --bg-base: #0b0f14;
+  --bg-raised: #12181f;
+  --bg-overlay: #1a222d;
+  --border-subtle: #1e2630;
+  --border-strong: #2a3441;
+  --text-primary: #e8eef5;
+  --text-secondary: #8b9bb0;
+  --text-muted: #5a6a7d;
+  --accent: #22d3ee;
+  --accent-hover: #67e8f9;
+  --accent-muted: rgba(34, 211, 238, 0.12);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --font: Inter, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  font-weight: 400;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.28);
+  color: var(--text-primary);
+}
+
+@keyframes ink-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ink-in {
+  animation: ink-in 180ms ease;
+}

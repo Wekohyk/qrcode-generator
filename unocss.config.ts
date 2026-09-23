@@ -15,6 +15,39 @@ const normalizeSize = (size: string) => {
 };
 
 export default defineConfig({
+  theme: {
+    colors: {
+      bg: {
+        base: '#0B0F14',
+        raised: '#12181F',
+        overlay: '#1A222D',
+      },
+      border: {
+        subtle: '#1E2630',
+        strong: '#2A3441',
+      },
+      text: {
+        primary: '#E8EEF5',
+        secondary: '#8B9BB0',
+        muted: '#5A6A7D',
+      },
+      accent: {
+        DEFAULT: '#22D3EE',
+        hover: '#67E8F9',
+        muted: 'rgba(34,211,238,0.12)',
+      },
+      success: '#34D399',
+      warning: '#FBBF24',
+      danger: '#F87171',
+    },
+  },
+  shortcuts: {
+    page: 'min-h-screen bg-bg-base text-text-primary',
+    panel: 'bg-bg-raised border border-border-subtle rounded-12px',
+    field:
+      'w-full border border-border-subtle rounded-8px bg-bg-raised px-12px py-8px text-14px text-text-primary outline-none transition-colors duration-150 focus:border-accent placeholder:text-text-muted disabled:opacity-40',
+    chip: 'rounded-8px border px-10px py-6px text-12px transition-colors duration-150',
+  },
   presets: [
     presetWind(),
     presetRemToPx({ baseFontSize: 4 }),
