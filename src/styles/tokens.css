@@ -2,7 +2,7 @@
   color-scheme: light;
   --bg-base: #e8f0e9;
   --bg-mist: #f4f8f4;
-  --bg-raised: rgba(255, 255, 255, 0.62);
+  --bg-raised: rgba(255, 255, 255, 0.72);
   --bg-overlay: rgba(255, 255, 255, 0.78);
   --border-subtle: rgba(36, 90, 58, 0.12);
   --border-strong: rgba(36, 90, 58, 0.22);
@@ -55,6 +55,13 @@ select {
   font-family: inherit;
 }
 
+button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+}
+
 ::selection {
   background: rgba(47, 155, 106, 0.22);
   color: var(--text-primary);
@@ -73,4 +80,13 @@ select {
 
 .glass-in {
   animation: glass-in 200ms ease-out;
+}
+
+.font-script {
+  font-family: 'Snell Roundhand', 'Segoe Script', 'Apple Chancery', cursive;
+}
+
+.font-serif {
+  font-family: 'Iowan Old Style', Palatino, 'Palatino Linotype', 'Songti SC',
+    serif;
 }

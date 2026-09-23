@@ -11,6 +11,8 @@ export interface QrStyle {
   margin: number;
   ecc: EccLevel;
   logo: string;
+  color?: string;
+  exportSize?: number;
 }
 
 export interface QrFields {
@@ -128,12 +130,14 @@ export function emptyFields(): QrFields {
   };
 }
 
-export function defaultStyle(module: ModuleStyle = 'classic'): QrStyle {
+export function defaultStyle(module: ModuleStyle = 'emerald'): QrStyle {
   return {
     module,
     margin: 2,
     ecc: 'M',
     logo: '',
+    color: module === 'classic' ? '#14181F' : '#2F9B6A',
+    exportSize: 1000,
   };
 }
 

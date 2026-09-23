@@ -21,18 +21,6 @@ const router = createRouter({
           meta: { title: '我的码' },
         },
         {
-          path: 'codes/new',
-          name: 'code-new',
-          component: () => import('@/pages/Editor.vue'),
-          meta: { title: '新建二维码' },
-        },
-        {
-          path: 'codes/:id',
-          name: 'code-edit',
-          component: () => import('@/pages/Editor.vue'),
-          meta: { title: '编辑二维码' },
-        },
-        {
           path: 'templates',
           name: 'templates',
           component: () => import('@/pages/Templates.vue'),
@@ -51,6 +39,18 @@ const router = createRouter({
           meta: { title: '设置' },
         },
       ],
+    },
+    {
+      path: '/codes/new',
+      name: 'code-new',
+      component: () => import('@/pages/Editor.vue'),
+      meta: { title: '新建二维码' },
+    },
+    {
+      path: '/codes/:id',
+      name: 'code-edit',
+      component: () => import('@/pages/Editor.vue'),
+      meta: { title: '编辑二维码' },
     },
     {
       path: '/v/:id',

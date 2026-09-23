@@ -1,8 +1,9 @@
 import QRCode from 'qrcode';
 import type { QrStyle } from '@/types/code';
 
-function moduleInk(module: string) {
-  return module === 'classic' ? '#14181F' : '#1F6B48';
+function moduleInk(style: QrStyle) {
+  if (style.color) return style.color;
+  return style.module === 'classic' ? '#14181F' : '#2F9B6A';
 }
 
 function loadImage(src: string) {
@@ -40,7 +41,7 @@ export async function paintQr(
     margin: style.margin,
     width,
     color: {
-      dark: moduleInk(style.module),
+      dark: moduleInk(style),
       light: '#FFFFFF',
     },
   });
@@ -65,7 +66,7 @@ export async function downloadQr(
   style: QrStyle,
   filename: string,
 ) {
-  const blob = await qrToBlob(text, style);
+  const blob = await qrToBlob(text, style, style.exportSize || 1000);
   if (!blob) return false;
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

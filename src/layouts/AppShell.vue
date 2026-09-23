@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Icon from '@/components/Icon.vue';
 import CommandPalette from '@/components/CommandPalette.vue';
-import { useSettingsStore } from '@/store/modules/settings';
 
 const route = useRoute();
-const settings = useSettingsStore();
 const paletteOpen = ref(false);
-const shortcut = /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘K' : 'Ctrl K';
 
 const nav = [
-  { to: '/', label: '工作台', icon: 'grid' },
-  { to: '/codes', label: '我的码', icon: 'codes' },
-  { to: '/templates', label: '模板库', icon: 'templates' },
+  { to: '/', label: '工作台', icon: 'home' },
+  { to: '/codes', label: '我的码', icon: 'grid' },
+  { to: '/templates', label: '模板', icon: 'templates' },
   { to: '/analytics', label: '数据', icon: 'analytics' },
   { to: '/settings', label: '设置', icon: 'settings' },
 ] as const;
-
-const crumb = computed(() => route.meta.title || 'Weko QR Code');
 
 function active(path: string) {
   if (path === '/') return route.path === '/';
@@ -37,79 +32,113 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 </script>
 
 <template>
-  <div class="page flex h-screen overflow-hidden">
+  <div class="page flex h-screen gap-14px p-16px">
     <aside
-      class="flex shrink-0 flex-col overflow-hidden border-r border-border-subtle bg-bg-raised shadow-[8px_0_32px_rgba(36,90,58,0.05)] backdrop-blur-xl transition-[width] duration-200"
-      :class="settings.sidebarCollapsed ? 'w-56px' : 'w-220px'"
+      class="panel relative flex w-228px shrink-0 flex-col overflow-hidden px-18px py-22px"
     >
-      <div
-        class="flex h-56px items-center gap-10px border-b border-border-subtle"
-        :class="settings.sidebarCollapsed ? 'justify-center px-0' : 'px-16px'"
+      <svg
+        class="pointer-events-none absolute left-0 top-0 h-92px w-92px text-[#c4a574]"
+        viewBox="0 0 92 92"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.2"
+        aria-hidden="true"
       >
-        <svg
-          viewBox="0 0 24 24"
-          class="h-18px w-18px shrink-0 text-accent"
+        <path d="M10 46C18 28 32 16 54 12" />
+        <path d="M16 34c12-2 18 8 14 18" />
+        <path d="M28 18c4 12 2 20-8 24" />
+        <path d="M22 26c8 2 12 8 8 14" />
+      </svg>
+      <svg
+        class="pointer-events-none absolute bottom-8px left-8px h-120px w-110px text-[#7d9f8a]"
+        viewBox="0 0 110 120"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <ellipse
+          cx="48"
+          cy="78"
+          rx="16"
+          ry="42"
+          transform="rotate(-28 48 78)"
+        />
+        <ellipse
+          cx="70"
+          cy="92"
+          rx="13"
+          ry="34"
+          transform="rotate(18 70 92)"
+          opacity="0.75"
+        />
+        <ellipse
+          cx="30"
+          cy="98"
+          rx="11"
+          ry="28"
+          transform="rotate(-58 30 98)"
+          opacity="0.85"
+        />
+        <path
+          d="M46 108c2-18 4-36 2-58"
           fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          aria-hidden="true"
-        >
-          <path
-            d="M12 21c4-3 7-6.5 7-10.5A6.5 6.5 0 0 0 6 8c0 1.2.4 2.4 1 3.4C5.2 12 4 13.6 4 15.5 4 18.5 7.5 21 12 21z"
-          />
-          <path d="M12 21V10" />
-        </svg>
-        <span v-if="!settings.sidebarCollapsed" class="text-16px font-semibold">
-          Weko
+          stroke="#5f8a70"
+          stroke-width="1.4"
+        />
+      </svg>
+      <svg
+        class="pointer-events-none absolute bottom-8px right-0 h-80px w-70px text-[#c4a574]"
+        viewBox="0 0 70 80"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.15"
+        aria-hidden="true"
+      >
+        <path d="M64 70C40 62 28 46 22 18" />
+        <path d="M58 74c-4-16-12-24-26-28" />
+        <path d="M48 58c-8 6-16 4-18-6" />
+      </svg>
+
+      <RouterLink to="/" class="relative z-1 mt-8px flex flex-col items-center">
+        <span class="relative inline-block">
+          <span class="font-script text-64px leading-none text-[#1c4d34]">
+            Wk
+          </span>
+          <svg
+            class="absolute -right-14px top-6px h-28px w-22px text-[#2f9b6a]"
+            viewBox="0 0 22 28"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              d="M11 27C8 18 4 14 2 8c5 2 8-1 9-8 1 7 5 10 10 9-3 5-5 10-6 18-1-3-3-5-4 0z"
+            />
+          </svg>
         </span>
-      </div>
-      <nav class="flex-1 py-12px">
+        <span class="font-serif mt-2px text-15px tracking-wide text-[#1c4d34]">
+          Weko QR Code
+        </span>
+        <span class="mt-10px h-1px w-64px bg-[#c4a574]" />
+      </RouterLink>
+
+      <nav class="relative z-1 mt-18px flex flex-col gap-4px">
         <RouterLink
           v-for="item in nav"
           :key="item.to"
           :to="item.to"
-          :title="item.label"
-          class="mx-8px mb-4px flex h-40px items-center gap-10px rounded-12px text-14px text-text-secondary transition-colors duration-200 hover:bg-bg-mist hover:text-text-primary"
-          :class="[
-            settings.sidebarCollapsed ? 'justify-center px-0' : 'px-10px',
+          class="flex h-42px items-center gap-10px rounded-12px px-14px text-14px text-[#24382c] transition-colors duration-200 hover:bg-white/50"
+          :class="
             active(item.to) &&
-              'bg-accent-muted text-accent hover:bg-accent-muted hover:text-accent',
-          ]"
+            'bg-[#e5f4eb] font-medium text-[#1f6b48] hover:bg-[#e5f4eb]'
+          "
         >
           <Icon :name="item.icon" />
-          <span v-if="!settings.sidebarCollapsed">{{ item.label }}</span>
+          {{ item.label }}
         </RouterLink>
       </nav>
-      <button
-        type="button"
-        class="mx-8px mb-12px flex h-36px items-center rounded-12px text-12px text-text-muted hover:bg-bg-mist hover:text-text-secondary"
-        :class="settings.sidebarCollapsed ? 'justify-center' : 'px-10px'"
-        @click="settings.sidebarCollapsed = !settings.sidebarCollapsed"
-      >
-        {{ settings.sidebarCollapsed ? '›' : '‹ 收起' }}
-      </button>
     </aside>
-    <div class="flex min-w-0 flex-1 flex-col">
-      <header
-        class="flex h-56px shrink-0 items-center justify-between border-b border-border-subtle px-20px"
-      >
-        <p class="truncate text-14px text-text-secondary">{{ crumb }}</p>
-        <button
-          type="button"
-          class="flex items-center gap-8px rounded-12px border border-border-subtle bg-white/60 px-10px py-6px text-12px text-text-muted backdrop-blur-xl hover:border-border-strong hover:text-text-secondary"
-          @click="paletteOpen = true"
-        >
-          <Icon name="search" />
-          搜索
-          <kbd class="rounded-4px border border-border-strong px-4px">
-            {{ shortcut }}
-          </kbd>
-        </button>
-      </header>
-      <main class="min-h-0 flex-1 overflow-hidden">
-        <router-view />
-      </main>
-    </div>
+    <main class="min-w-0 flex-1">
+      <router-view />
+    </main>
     <CommandPalette v-model:open="paletteOpen" />
   </div>
 </template>

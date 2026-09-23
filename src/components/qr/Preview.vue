@@ -6,6 +6,7 @@ import { paintQr } from '@/composables/useQr';
 const props = defineProps<{
   text: string;
   style: QrStyle;
+  plain?: boolean;
 }>();
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -34,16 +35,19 @@ watch(
 
 <template>
   <div
-    :key="`${text}:${style.module}:${style.logo}:${style.ecc}:${style.margin}`"
+    :key="`${text}:${style.module}:${style.logo}:${style.ecc}:${style.margin}:${style.color || ''}`"
     class="glass-in flex flex-col items-center"
   >
     <div
-      class="flex h-252px w-252px items-center justify-center rounded-12px bg-white"
+      class="flex items-center justify-center"
+      :class="
+        plain ? 'h-244px w-244px' : 'h-252px w-252px rounded-12px bg-white'
+      "
     >
       <canvas
         v-show="!empty && !error"
         ref="canvasRef"
-        class="h-220px w-220px"
+        :class="plain ? 'h-230px w-230px' : 'h-220px w-220px'"
       />
       <p v-if="empty" class="px-24px text-center text-12px text-[#5A7264]">
         填写内容后生成预览

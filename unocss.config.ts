@@ -20,7 +20,7 @@ export default defineConfig({
       bg: {
         base: '#E8F0E9',
         mist: '#F4F8F4',
-        raised: 'rgba(255,255,255,0.62)',
+        raised: 'rgba(255,255,255,0.74)',
         overlay: 'rgba(255,255,255,0.78)',
       },
       border: {
@@ -51,7 +51,7 @@ export default defineConfig({
   shortcuts: {
     page: 'min-h-screen bg-bg-base text-text-primary',
     panel:
-      'bg-bg-raised border border-border-glass backdrop-blur-xl rounded-20px shadow-[0_8px_32px_rgba(36,90,58,0.08)]',
+      'bg-bg-raised border border-border-glass backdrop-blur-xl rounded-24px shadow-[0_10px_40px_rgba(36,90,58,0.08)]',
     field:
       'w-full border border-border-subtle rounded-12px bg-white/70 px-12px py-8px text-14px text-text-primary outline-none transition-colors duration-200 focus:border-accent focus:shadow-[0_0_0_2px_rgba(47,155,106,0.22)] placeholder:text-text-muted disabled:opacity-40',
     chip: 'rounded-12px border px-10px py-6px text-12px transition-colors duration-200',
