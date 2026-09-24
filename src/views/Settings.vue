@@ -25,7 +25,7 @@ async function onFile(event: Event) {
 
 <template>
   <div class="h-full overflow-y-auto px-24px py-20px">
-    <h1 class="text-20px font-semibold">设置</h1>
+    <h1 class="text-28px font-600">设置</h1>
     <p class="mt-6px text-14px text-text-secondary">
       显示名出现在工作台。品牌标记可放进新码。
     </p>

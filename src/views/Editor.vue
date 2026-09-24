@@ -323,51 +323,23 @@ async function togglePause() {
     >
       <RouterLink to="/" class="flex items-center gap-10px">
         <span
-          class="flex h-36px w-36px items-center justify-center rounded-full border border-white/80 bg-white/70 text-[#2f9b6a]"
+          class="text-22px text-[#1c4d34] font-900 font-[cormorant-garamond-light-italic]"
         >
-          <svg
-            viewBox="0 0 24 24"
-            class="h-18px w-18px"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            aria-hidden="true"
-          >
-            <path
-              d="M12 21c4-4 6.5-7 6.5-11A6.2 6.2 0 0 0 12 4a6.2 6.2 0 0 0-6.5 6c0 4 2.5 7 6.5 11z"
-            />
-            <path d="M12 21V9" />
-          </svg>
+          Weko QR Code
         </span>
-        <span class="font-serif text-22px text-[#1c4d34]">Weko QR Code</span>
       </RouterLink>
       <div class="relative flex items-center gap-8px">
-        <button
-          type="button"
-          class="flex h-38px w-38px items-center justify-center rounded-12px border border-white/80 bg-white/70 text-[#1c4d34]"
-          aria-label="帮助"
-          @click="helpOpen = !helpOpen"
+        <div
+          class="size-36px flex-center rounded-12px bg-#fff b-1 b-solid b-#fff/80 bg-#fff/70 cursor-pointer"
         >
-          ?
-        </button>
-        <span
-          class="flex h-38px w-38px items-center justify-center rounded-12px border border-white/80 bg-white/70 text-[#1c4d34]"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            class="h-16px w-16px"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.7"
-          >
-            <circle cx="12" cy="12" r="4" />
-            <path
-              d="M12 2.5v2.2M12 19.3V21.5M2.5 12h2.2M19.3 12H21.5M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"
-              stroke-linecap="round"
-            />
-          </svg>
-        </span>
+          <img
+            src="/images/question_mark.svg"
+            alt=""
+            class="h-18px w-18px"
+            @click="helpOpen = !helpOpen"
+          />
+        </div>
+
         <div
           v-if="helpOpen"
           class="absolute right-0 top-46px z-20 w-240px rounded-14px border border-border-glass bg-white/95 p-12px text-13px text-text-secondary shadow-[0_10px_30px_rgba(36,90,58,0.12)]"
@@ -523,21 +495,10 @@ async function togglePause() {
 
       <section class="panel flex min-h-0 flex-col items-center px-18px py-16px">
         <h2
-          class="flex w-full items-center gap-8px text-16px font-medium text-[#1c4d34]"
+          class="flex w-full items-center gap-4px text-16px font-medium text-[#1c4d34]"
         >
-          <svg
-            viewBox="0 0 24 24"
-            class="h-16px w-16px"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.7"
-          >
-            <path
-              d="M12 3l1.2 4.2L17 8.5l-3.8 1.3L12 14l-1.2-4.2L7 8.5l3.8-1.3z"
-            />
-            <path d="M18 13l.6 2 2 .6-2 .6-.6 2-.6-2-2-.6 2-.6z" />
-          </svg>
-          QR 预览
+          <img class="size-20px" src="/images/star.svg" alt="" />
+          <span>QR 预览</span>
         </h2>
         <div class="flex min-h-0 flex-1 items-center justify-center">
           <div

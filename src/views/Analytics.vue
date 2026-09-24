@@ -102,7 +102,7 @@ const sources = computed(() => {
 
 <template>
   <div class="h-full overflow-y-auto px-24px py-20px">
-    <h1 class="text-20px font-semibold">数据</h1>
+    <h1 class="text-28px font-600">数据</h1>
     <p class="mt-6px max-w-520px text-14px text-text-secondary">
       活码打开次数来自短链服务。静态码不经过短链，没有扫码数。
     </p>

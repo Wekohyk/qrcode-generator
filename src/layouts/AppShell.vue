@@ -32,7 +32,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 </script>
 
 <template>
-  <div class="page flex h-screen gap-14px p-16px">
+  <div
+    class="page flex h-screen gap-14px p-16px bg-[url(/images/background_image.webp)] bg-cover bg-no-repeat bg-center"
+  >
     <aside
       class="panel relative flex w-228px shrink-0 flex-col overflow-hidden px-18px py-22px"
     >
@@ -50,43 +52,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
         <path d="M22 26c8 2 12 8 8 14" />
       </svg>
       <svg
-        class="pointer-events-none absolute bottom-8px left-8px h-120px w-110px text-[#7d9f8a]"
-        viewBox="0 0 110 120"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <ellipse
-          cx="48"
-          cy="78"
-          rx="16"
-          ry="42"
-          transform="rotate(-28 48 78)"
-        />
-        <ellipse
-          cx="70"
-          cy="92"
-          rx="13"
-          ry="34"
-          transform="rotate(18 70 92)"
-          opacity="0.75"
-        />
-        <ellipse
-          cx="30"
-          cy="98"
-          rx="11"
-          ry="28"
-          transform="rotate(-58 30 98)"
-          opacity="0.85"
-        />
-        <path
-          d="M46 108c2-18 4-36 2-58"
-          fill="none"
-          stroke="#5f8a70"
-          stroke-width="1.4"
-        />
-      </svg>
-      <svg
-        class="pointer-events-none absolute bottom-8px right-0 h-80px w-70px text-[#c4a574]"
+        class="pointer-events-none absolute bottom--15px right-8px h-80px w-70px text-[#c4a574] rotate-270"
         viewBox="0 0 70 80"
         fill="none"
         stroke="currentColor"
@@ -100,21 +66,15 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
 
       <RouterLink to="/" class="relative z-1 mt-8px flex flex-col items-center">
         <span class="relative inline-block">
-          <span class="font-script text-64px leading-none text-[#1c4d34]">
+          <span
+            class="font-script text-64px leading-none text-[#1c4d34] font-900"
+          >
             Wk
           </span>
-          <svg
-            class="absolute -right-14px top-6px h-28px w-22px text-[#2f9b6a]"
-            viewBox="0 0 22 28"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M11 27C8 18 4 14 2 8c5 2 8-1 9-8 1 7 5 10 10 9-3 5-5 10-6 18-1-3-3-5-4 0z"
-            />
-          </svg>
         </span>
-        <span class="font-serif mt-2px text-15px tracking-wide text-[#1c4d34]">
+        <span
+          class="font-serif mt-2px text-15px tracking-wide text-[#1c4d34] font-600"
+        >
           Weko QR Code
         </span>
         <span class="mt-10px h-1px w-64px bg-[#c4a574]" />
@@ -125,11 +85,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKey));
           v-for="item in nav"
           :key="item.to"
           :to="item.to"
-          class="flex h-42px items-center gap-10px rounded-12px px-14px text-14px text-[#24382c] transition-colors duration-200 hover:bg-white/50"
-          :class="
+          :class="[
+            'flex h-42px items-center gap-10px rounded-12px px-14px text-14px text-[#24382c] transition-colors duration-200 hover:bg-#e5f4eb',
             active(item.to) &&
-            'bg-[#e5f4eb] font-medium text-[#1f6b48] hover:bg-[#e5f4eb]'
-          "
+              'bg-[#e5f4eb] font-medium text-[#1f6b48] hover:bg-[#e5f4eb]',
+          ]"
         >
           <Icon :name="item.icon" />
           {{ item.label }}

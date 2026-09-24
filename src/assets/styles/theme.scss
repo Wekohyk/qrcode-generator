@@ -1,16 +1,24 @@
-// Deep and shallow model
 :root {
-  color-scheme: light dark;
-
-  --textOrigin: 255, 255, 255;
-
-  --text: rgb(var(--textOrigin));
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --textOrigin: 0, 0, 0;
-
-    --text: rgb(var(--textOrigin));
-  }
+  color-scheme: light;
+  --bg-base: #e8f0e9;
+  --bg-mist: #f4f8f4;
+  --bg-raised: rgba(255, 255, 255, 0.72);
+  --bg-overlay: rgba(255, 255, 255, 0.78);
+  --border-subtle: rgba(36, 90, 58, 0.12);
+  --border-strong: rgba(36, 90, 58, 0.22);
+  --border-glass: rgba(255, 255, 255, 0.55);
+  --text-primary: #1a2e24;
+  --text-secondary: #5a7264;
+  --text-muted: #8aa093;
+  --accent: #2f9b6a;
+  --accent-hover: #3cb87e;
+  --accent-deep: #1f6b48;
+  --accent-muted: rgba(47, 155, 106, 0.14);
+  --accent-soft: #a8d5b5;
+  --ornament-gold: #c4a574;
+  --success: #2f9b6a;
+  --warning: #d4a017;
+  --danger: #d46565;
+  --font: Inter, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+  --glass-shadow: 0 8px 32px rgba(36, 90, 58, 0.08);
 }

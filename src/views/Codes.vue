@@ -185,24 +185,7 @@ async function toggleOne(item: QrCode) {
 <template>
   <div class="panel flex h-full flex-col overflow-hidden px-22px py-18px">
     <div class="mb-14px flex items-center gap-12px">
-      <h1 class="font-serif flex items-center gap-8px text-28px text-[#1c4d34]">
-        我的码
-        <svg
-          class="h-18px w-34px text-[#7eaa8c]"
-          viewBox="0 0 34 18"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <ellipse
-            cx="12"
-            cy="10"
-            rx="5"
-            ry="8"
-            transform="rotate(-40 12 10)"
-          />
-          <ellipse cx="22" cy="9" rx="4" ry="7" transform="rotate(25 22 9)" />
-        </svg>
-      </h1>
+      <div class="text-28px font-600 text-[#1c4d34]">我的码</div>
       <div class="relative ml-auto w-280px">
         <svg
           class="pointer-events-none absolute left-12px top-1/2 h-14px w-14px -translate-y-1/2 text-text-muted"
@@ -223,7 +206,7 @@ async function toggleOne(item: QrCode) {
         <button
           v-if="keyword"
           type="button"
-          class="absolute right-8px top-1/2 flex h-22px w-22px -translate-y-1/2 items-center justify-center rounded-full text-text-muted hover:bg-bg-mist"
+          class="absolute right-8px top-1/2 flex h-22px w-22px -translate-y-1/2 items-center justify-center rounded-full text-text-muted hover:bg-bg-mist cursor-pointer"
           aria-label="清除搜索"
           @click="keyword = ''"
         >
@@ -233,7 +216,7 @@ async function toggleOne(item: QrCode) {
       <div class="relative">
         <button
           type="button"
-          class="flex h-38px items-center gap-6px rounded-full bg-accent px-16px text-14px text-white shadow-[0_8px_16px_rgba(47,155,106,0.28)] hover:bg-accent-hover"
+          class="flex h-38px items-center gap-6px rounded-full bg-accent px-16px text-14px text-white shadow-[0_8px_16px_rgba(47,155,106,0.28)] hover:bg-accent-hover cursor-pointer"
           @click="createOpen = !createOpen"
         >
           + 新建二维码
@@ -249,14 +232,18 @@ async function toggleOne(item: QrCode) {
           </svg>
         </button>
         <div
-          v-if="createOpen"
-          class="absolute right-0 top-44px z-20 w-160px rounded-14px border border-border-glass bg-white/95 p-6px shadow-[0_10px_30px_rgba(36,90,58,0.12)]"
+          :class="[
+            'absolute right-0 top-44px z-20 w-160px rounded-14px border border-border-glass bg-white/95 p-6px shadow-[0_10px_30px_rgba(36,90,58,0.12)] duration-300 ease-in-out transition-all',
+            createOpen
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-10',
+          ]"
         >
           <button
             v-for="item in createKinds"
             :key="item.id"
             type="button"
-            class="block h-34px w-full rounded-10px px-10px text-left text-14px text-text-primary hover:bg-[#e5f4eb]"
+            class="block h-34px w-full rounded-10px px-10px text-left text-14px text-text-primary hover:bg-[#e5f4eb] cursor-pointer"
             @click="create(item.id)"
           >
             {{ item.label }}

@@ -18,7 +18,7 @@ function openTemplate(id: string) {
 
 <template>
   <div class="h-full overflow-y-auto px-24px py-20px">
-    <h1 class="text-20px font-semibold">模板库</h1>
+    <h1 class="text-28px font-600">模板库</h1>
     <p class="mt-6px text-14px text-text-secondary">
       先选类型，或套用一套样式。
     </p>

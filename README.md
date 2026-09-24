@@ -138,7 +138,7 @@ colors: {
 
 ```
 src/
-  styles/tokens.css      # CSS 变量（含 blur / glass）
+  assets/style/tokens.css      # CSS 变量（含 blur / glass）
   layouts/AppShell.vue
   pages/{Workbench,Codes,Editor,Templates,Analytics}.vue
   components/qr/{Preview,StylePicker,TypeTabs}.vue

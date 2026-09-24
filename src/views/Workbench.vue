@@ -30,7 +30,7 @@ function payload(id: string) {
 
 <template>
   <div class="h-full overflow-y-auto px-24px py-20px">
-    <h1 class="text-28px font-semibold">工作台</h1>
+    <h1 class="text-28px font-600">工作台</h1>
     <p class="mt-6px text-14px text-text-secondary">
       {{
         settings.displayName

@@ -14,7 +14,6 @@ import { getI18n } from './lang';
 import './assets/styles/index.scss';
 // Import the Unocss utilities styles
 import 'uno.css';
-import './styles/tokens.css';
 // App
 import App from './App.vue';
 

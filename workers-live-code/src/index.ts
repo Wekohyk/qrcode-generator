@@ -157,7 +157,13 @@ function resolveScan(code: CodeRow): Response {
     case 'vcard':
       return renderTextPage(
         code.title || '名片',
-        text(payload.name, payload.org, payload.tel, payload.email, payload.url),
+        text(
+          payload.name,
+          payload.org,
+          payload.tel,
+          payload.email,
+          payload.url,
+        ),
       );
     case 'wifi':
       return renderTextPage(
@@ -189,7 +195,14 @@ async function createCode(env: Env, req: Request): Promise<Response> {
     `INSERT INTO codes (id, short_key, user_id, type, title, payload_json, status)
      VALUES (?, ?, ?, ?, ?, ?, 'active')`,
   )
-    .bind(id, shortKey, body.user_id ?? null, type, body.title ?? null, payloadJson)
+    .bind(
+      id,
+      shortKey,
+      body.user_id ?? null,
+      type,
+      body.title ?? null,
+      payloadJson,
+    )
     .run();
 
   const base = env.SHORT_BASE || new URL(req.url).origin;
@@ -199,7 +212,11 @@ async function createCode(env: Env, req: Request): Promise<Response> {
   );
 }
 
-async function patchCode(env: Env, id: string, req: Request): Promise<Response> {
+async function patchCode(
+  env: Env,
+  id: string,
+  req: Request,
+): Promise<Response> {
   const body = (await req.json()) as {
     title?: string;
     payload?: Record<string, unknown>;
@@ -233,7 +250,11 @@ async function patchCode(env: Env, id: string, req: Request): Promise<Response> 
 }
 
 export default {
-  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(
+    req: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
     if (req.method === 'OPTIONS') return json({ ok: true });
 
     const { pathname } = new URL(req.url);
