@@ -6,6 +6,7 @@
 
 // Prevents mobile browsers from changing font sizes
 html {
+  line-height: normal;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   overscroll-behavior: none; // 尽量关掉橡皮筋，进一步避免露边
@@ -146,6 +147,7 @@ input,
 textarea,
 select {
   font-family: inherit;
+  line-height: inherit;
 }
 
 button {

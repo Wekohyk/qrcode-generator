@@ -24,6 +24,7 @@
     ]
   },
   "dependencies": {
+    "@arco-design/web-vue": "^2.58.0",
     "dayjs": "^1.11.11",
     "pinia": "^4.0.3",
     "pinia-plugin-persistedstate": "^4.7.1",

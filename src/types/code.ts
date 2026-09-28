@@ -130,14 +130,14 @@ export function emptyFields(): QrFields {
   };
 }
 
-export function defaultStyle(module: ModuleStyle = 'emerald'): QrStyle {
+export function defaultStyle(module: ModuleStyle = 'classic'): QrStyle {
   return {
     module,
-    margin: 2,
+    margin: 1,
     ecc: 'M',
     logo: '',
     color: module === 'classic' ? '#14181F' : '#2F9B6A',
-    exportSize: 1000,
+    exportSize: 512,
   };
 }
 
