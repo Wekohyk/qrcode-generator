@@ -2,6 +2,7 @@ export type QrKind = 'url' | 'text' | 'vcard' | 'wifi' | 'rich';
 export type QrMode = 'static' | 'live';
 export type QrStatus = 'active' | 'static' | 'paused';
 export type ModuleStyle = 'classic' | 'emerald';
+export type EyeStyle = 'square' | 'rounded' | 'circle' | 'dot';
 export type EccLevel = 'L' | 'M' | 'Q' | 'H';
 export type WifiEncryption = 'WPA' | 'WEP' | 'nopass';
 export type ScanSource = 'direct' | 'wechat' | 'other';
@@ -11,6 +12,7 @@ export interface QrStyle {
   margin: number;
   ecc: EccLevel;
   logo: string;
+  eye: EyeStyle;
   color?: string;
   exportSize?: number;
 }
@@ -79,6 +81,7 @@ export const styleTemplates = [
       margin: 2,
       ecc: 'M',
       logo: '',
+      eye: 'square',
     },
   },
   {
@@ -90,6 +93,7 @@ export const styleTemplates = [
       margin: 2,
       ecc: 'M',
       logo: '',
+      eye: 'square',
     },
   },
   {
@@ -101,6 +105,7 @@ export const styleTemplates = [
       margin: 2,
       ecc: 'H',
       logo: '',
+      eye: 'square',
     },
   },
 ] as const satisfies ReadonlyArray<{
@@ -136,6 +141,7 @@ export function defaultStyle(module: ModuleStyle = 'classic'): QrStyle {
     margin: 1,
     ecc: 'M',
     logo: '',
+    eye: 'square',
     color: module === 'classic' ? '#14181F' : '#2F9B6A',
     exportSize: 512,
   };

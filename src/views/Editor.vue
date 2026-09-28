@@ -9,6 +9,7 @@ import {
   isLive,
   parseKind,
   styleFromTemplate,
+  type EyeStyle,
   type QrDraft,
   type QrKind,
 } from '@/types/code';
@@ -38,6 +39,35 @@ const kinds: { id: QrKind; label: string }[] = [
   { id: 'rich', label: '图文活码' },
 ];
 
+const eyes: { id: EyeStyle; label: string; frame: string; pupil: string }[] = [
+  {
+    id: 'square',
+    label: '方形',
+    frame: 'M3 3h18v18H3z M7 7h10v10H7z',
+    pupil: 'M10 10h4v4h-4z',
+  },
+  {
+    id: 'rounded',
+    label: '圆角',
+    frame:
+      'M8 3h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5z M8 8h8v8H8z',
+    pupil: 'M10 10h4v4h-4z',
+  },
+  {
+    id: 'circle',
+    label: '圆形',
+    frame: 'M12 3a9 9 0 1 0 .01 0z M12 7.2a4.8 4.8 0 1 1-.01 0z',
+    pupil: 'M12 9.6a2.4 2.4 0 1 0 .01 0z',
+  },
+  {
+    id: 'dot',
+    label: '圆点',
+    frame:
+      'M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z M7.8 7.8h8.4v8.4H7.8z',
+    pupil: 'M12 9.4a2.6 2.6 0 1 0 .01 0z',
+  },
+];
+
 const draft = ref<QrDraft>({
   name: '',
   kind: 'url',
@@ -50,6 +80,7 @@ const error = ref('');
 const savedHint = ref(false);
 const copied = ref(false);
 const imageError = ref('');
+const logoError = ref('');
 const styleSelect = ref<{ $el?: HTMLElement } | null>(null);
 const colorTrigger = ref<HTMLElement | null>(null);
 const styleOpen = ref(false);
@@ -110,6 +141,7 @@ const urlReady = computed(
 function applyRoute() {
   missing.value = false;
   imageError.value = '';
+  logoError.value = '';
   if (route.name === 'code-new') {
     const kind = parseKind(route.query.kind);
     draft.value = {
@@ -131,7 +163,7 @@ function applyRoute() {
     kind: found.kind,
     mode: found.mode,
     fields: { ...found.fields },
-    style: { ...found.style },
+    style: { ...found.style, eye: found.style.eye || 'square' },
   };
 }
 
@@ -202,6 +234,26 @@ function toggleLogo() {
 function toggleMode() {
   if (draft.value.kind === 'rich') return;
   draft.value.mode = draft.value.mode === 'live' ? 'static' : 'live';
+}
+
+async function onLogoUpload(
+  _list: { file?: File }[],
+  current: { file?: File },
+) {
+  const file = current.file;
+  if (!file) return;
+  try {
+    draft.value.style.logo = await readImageFile(file);
+    draft.value.style.ecc = 'H';
+    logoError.value = '';
+  } catch (reason) {
+    logoError.value = reason instanceof Error ? reason.message : '图片读取失败';
+  }
+}
+
+function clearLogo() {
+  draft.value.style.logo = '';
+  logoError.value = '';
 }
 
 async function onRichUpload(
@@ -499,13 +551,16 @@ async function togglePause() {
         </h2>
         <div class="flex min-h-0 flex-1 items-center justify-center">
           <div
-            class="relative h-400px w-400px transition-transform duration-200"
+            class="relative h-230px w-230px overflow-hidden rounded-20 transition-transform duration-200"
             :style="{ transform: `scale(${zoom})` }"
           >
-            <ArtFrame />
-            <div class="absolute inset-0 flex items-center justify-center">
-              <Preview plain :text="payload" :style="draft.style" />
-            </div>
+            <Preview
+              plain
+              class="absolute inset-0"
+              :text="payload"
+              :style="draft.style"
+            />
+            <ArtFrame class="pointer-events-none absolute inset-0 z-1" />
           </div>
         </div>
         <p
@@ -845,13 +900,71 @@ async function togglePause() {
                   <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
                 </svg>
               </template>
-              <a-option value="L">L（低）</a-option>
-              <a-option value="M">M（标准）</a-option>
-              <a-option value="Q">Q（较高）</a-option>
+              <a-option value="L" :disabled="Boolean(draft.style.logo)">
+                L（低）
+              </a-option>
+              <a-option value="M" :disabled="Boolean(draft.style.logo)">
+                M（标准）
+              </a-option>
+              <a-option value="Q" :disabled="Boolean(draft.style.logo)">
+                Q（较高）
+              </a-option>
               <a-option value="H">H（高）</a-option>
             </a-select>
           </div>
           <p class="mb-12px text-12px text-text-muted">{{ eccHint }}</p>
+
+          <span class="mb-6px block text-13px text-text-secondary">码眼</span>
+          <div class="mb-14px grid grid-cols-4 gap-8px">
+            <button
+              v-for="item in eyes"
+              :key="item.id"
+              type="button"
+              class="eye-btn"
+              :class="{ 'is-on': (draft.style.eye || 'square') === item.id }"
+              @click="draft.style.eye = item.id"
+            >
+              <svg viewBox="0 0 24 24" class="h-22px w-22px">
+                <path :d="item.frame" fill="currentColor" fill-rule="evenodd" />
+                <path :d="item.pupil" fill="currentColor" />
+              </svg>
+              <span>{{ item.label }}</span>
+            </button>
+          </div>
+
+          <span class="mb-6px block text-13px text-text-secondary">
+            中心 Logo
+          </span>
+          <div class="mb-6px flex items-center gap-8px">
+            <div class="logo-slot">
+              <img v-if="draft.style.logo" :src="draft.style.logo" alt="" />
+              <span v-else>无</span>
+            </div>
+            <a-upload
+              :auto-upload="false"
+              accept="image/*"
+              :show-file-list="false"
+              @change="onLogoUpload"
+            >
+              <template #upload-button>
+                <a-button type="text" class="chip-btn">上传图片</a-button>
+              </template>
+            </a-upload>
+            <a-button
+              v-if="draft.style.logo"
+              type="text"
+              class="chip-btn is-quiet"
+              @click="clearLogo"
+            >
+              移除
+            </a-button>
+          </div>
+          <p v-if="logoError" class="mb-12px text-12px text-danger">
+            {{ logoError }}
+          </p>
+          <p v-else class="mb-12px text-12px text-text-muted">
+            图片会放在二维码正中，并自动使用 H 级纠错。
+          </p>
 
           <a-button type="text" class="fold-btn" @click="advanced = !advanced">
             高级选项
@@ -1331,6 +1444,51 @@ async function togglePause() {
   flex-shrink: 0;
   border: 1px solid rgba(36, 90, 58, 0.12);
   border-radius: 2px;
+}
+
+.editor .eye-btn {
+  display: flex;
+  height: 64px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  border: 1px solid rgba(36, 90, 58, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #5a7264;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.editor .eye-btn.is-on {
+  border-color: #2f9b6a;
+  background: #e5f4eb;
+  color: #1c4d34;
+}
+
+.editor .logo-slot {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(36, 90, 58, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #8aa093;
+  font-size: 12px;
+}
+
+.editor .logo-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
 }
 
 .editor .hidden-net.arco-checkbox {

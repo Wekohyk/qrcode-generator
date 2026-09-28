@@ -10,7 +10,8 @@ import {
 } from '@/types/code';
 
 function createId() {
-  return crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 export interface LiveLink {
