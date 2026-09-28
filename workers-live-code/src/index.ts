@@ -8,6 +8,7 @@
 export interface Env {
   DB: D1Database;
   SHORT_BASE?: string;
+  ASSETS?: Fetcher;
 }
 
 type CodeType = 'url' | 'text' | 'vcard' | 'wifi' | 'page';
@@ -178,6 +179,28 @@ function resolveScan(code: CodeRow): Response {
   }
 }
 
+async function listCodes(env: Env, req: Request): Promise<Response> {
+  const rows = await env.DB.prepare(
+    `SELECT id, short_key, type, title, payload_json, status, created_at, updated_at
+     FROM codes WHERE status != 'deleted' ORDER BY updated_at DESC`,
+  ).all<{
+    id: string;
+    short_key: string;
+    type: CodeType;
+    title: string | null;
+    payload_json: string;
+    status: CodeStatus;
+    created_at: string;
+    updated_at: string;
+  }>();
+  const base = env.SHORT_BASE || new URL(req.url).origin;
+  const items = (rows.results ?? []).map(row => ({
+    ...row,
+    scan_url: `${base}/r/${row.short_key}`,
+  }));
+  return json({ items });
+}
+
 async function createCode(env: Env, req: Request): Promise<Response> {
   const body = (await req.json()) as {
     type?: CodeType;
@@ -269,6 +292,10 @@ export default {
       return resolveScan(code);
     }
 
+    if (pathname === '/api/codes' && req.method === 'GET') {
+      return listCodes(env, req);
+    }
+
     if (pathname === '/api/codes' && req.method === 'POST') {
       return createCode(env, req);
     }
@@ -304,10 +331,11 @@ export default {
       return json({ total: total?.c ?? 0, recent: recent.results ?? [] });
     }
 
-    if (pathname === '/' || pathname === '/health') {
+    if (pathname === '/health' || (pathname === '/' && !env.ASSETS)) {
       return json({ service: 'weko-qr-live', ok: true });
     }
 
+    if (env.ASSETS) return env.ASSETS.fetch(req);
     return new Response('Not Found', { status: 404 });
   },
 };

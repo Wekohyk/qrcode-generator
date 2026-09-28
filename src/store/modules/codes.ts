@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia';
-import { patchLiveCode } from '@/api/live';
+import {
+  createLiveCode,
+  listLiveCodes,
+  patchLiveCode,
+  recordToCode,
+  storedPayload,
+  toLiveType,
+} from '@/api/live';
 import {
   defaultName,
   isLive,
@@ -9,20 +16,29 @@ import {
   type ScanSource,
 } from '@/types/code';
 
-function createId() {
-  const bytes = crypto.getRandomValues(new Uint8Array(6));
-  return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+let inflight: Promise<void> | null = null;
+
+function readLocal(): QrCode[] {
+  try {
+    const raw = localStorage.getItem('codes');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as { items?: QrCode[] };
+    return Array.isArray(parsed.items) ? parsed.items : [];
+  } catch {
+    return [];
+  }
 }
 
-export interface LiveLink {
-  remoteId: string;
-  shortKey: string;
-  scanUrl: string;
+function writeLocal(items: QrCode[]) {
+  if (!items.length) localStorage.removeItem('codes');
+  else localStorage.setItem('codes', JSON.stringify({ items }));
 }
 
 export const useCodesStore = defineStore('codes', {
   state: () => ({
     items: [] as QrCode[],
+    ready: false,
+    loadError: '',
   }),
   getters: {
     sorted(state) {
@@ -30,20 +46,64 @@ export const useCodesStore = defineStore('codes', {
     },
   },
   actions: {
-    create(draft: QrDraft, link?: LiveLink) {
-      const now = Date.now();
+    load() {
+      if (this.ready) return Promise.resolve();
+      if (!inflight) inflight = this.pull();
+      return inflight;
+    },
+    async pull() {
+      try {
+        let local = readLocal();
+        const pending = local.filter(item => !item.remoteId);
+        for (const item of pending) {
+          const mode = item.kind === 'rich' ? 'live' : item.mode;
+          await createLiveCode({
+            type: toLiveType(item.kind),
+            title: item.name,
+            payload: storedPayload({
+              name: item.name,
+              kind: item.kind,
+              mode,
+              fields: item.fields,
+              style: item.style,
+            }),
+          });
+          local = local.filter(row => row.id !== item.id);
+          writeLocal(local);
+        }
+        const listed = await listLiveCodes();
+        writeLocal([]);
+        this.items = listed.items.map(recordToCode);
+        this.loadError = '';
+      } catch (reason) {
+        this.items = [];
+        this.loadError =
+          reason instanceof Error ? reason.message : '后端没有完成这次请求';
+      } finally {
+        this.ready = true;
+        inflight = null;
+      }
+    },
+    async create(draft: QrDraft) {
       const mode = draft.kind === 'rich' ? 'live' : draft.mode;
+      const name = draft.name.trim() || defaultName(draft.kind);
+      const created = await createLiveCode({
+        type: toLiveType(draft.kind),
+        title: name,
+        payload: storedPayload({ ...draft, name, mode }),
+      });
+      const now = Date.now();
       const code: QrCode = {
-        id: createId(),
-        name: draft.name.trim() || defaultName(draft.kind),
+        id: created.id,
+        name,
         kind: draft.kind,
         mode,
         status: isLive(draft.kind, mode) ? 'active' : 'static',
         fields: { ...draft.fields },
         style: { ...draft.style },
-        remoteId: link?.remoteId,
-        shortKey: link?.shortKey,
-        scanUrl: link?.scanUrl,
+        remoteId: created.id,
+        shortKey: created.short_key,
+        scanUrl: created.scan_url,
         createdAt: now,
         updatedAt: now,
         scans: [],
@@ -51,20 +111,22 @@ export const useCodesStore = defineStore('codes', {
       this.items.unshift(code);
       return code;
     },
-    update(id: string, draft: QrDraft, link?: LiveLink) {
+    async update(id: string, draft: QrDraft) {
       const current = this.items.find(item => item.id === id);
       if (!current) return;
       const mode = draft.kind === 'rich' ? 'live' : draft.mode;
-      current.name = draft.name.trim() || current.name;
+      const name = draft.name.trim() || current.name;
+      await patchLiveCode(id, {
+        type: toLiveType(draft.kind),
+        title: name,
+        payload: storedPayload({ ...draft, name, mode }),
+        status: mode === 'static' ? 'active' : undefined,
+      });
+      current.name = name;
       current.kind = draft.kind;
       current.mode = mode;
       current.fields = { ...draft.fields };
       current.style = { ...draft.style };
-      if (link) {
-        current.remoteId = link.remoteId;
-        current.shortKey = link.shortKey;
-        current.scanUrl = link.scanUrl;
-      }
       if (current.status !== 'paused' || mode === 'static') {
         current.status = isLive(draft.kind, mode) ? 'active' : 'static';
       }
@@ -72,15 +134,9 @@ export const useCodesStore = defineStore('codes', {
     },
     async remove(ids: string[]) {
       const selected = new Set(ids);
-      const remote = this.items.filter(
-        item => selected.has(item.id) && item.remoteId,
-      );
+      const targets = this.items.filter(item => selected.has(item.id));
       await Promise.all(
-        remote.map(item =>
-          patchLiveCode(item.remoteId || '', { status: 'deleted' }).catch(
-            () => undefined,
-          ),
-        ),
+        targets.map(item => patchLiveCode(item.id, { status: 'deleted' })),
       );
       this.items = this.items.filter(item => !selected.has(item.id));
     },
@@ -93,13 +149,12 @@ export const useCodesStore = defineStore('codes', {
         item => selected.has(item.id) && item.mode === 'live',
       );
       await Promise.all(
-        targets
-          .filter(item => item.remoteId)
-          .map(item => patchLiveCode(item.remoteId || '', { status })),
+        targets.map(item => patchLiveCode(item.id, { status })),
       );
+      const now = Date.now();
       targets.forEach(item => {
         item.status = status;
-        item.updatedAt = Date.now();
+        item.updatedAt = now;
       });
     },
     addScan(id: string, source: ScanSource) {
@@ -109,8 +164,5 @@ export const useCodesStore = defineStore('codes', {
       }
       current.scans.push({ at: Date.now(), source });
     },
-  },
-  persist: {
-    pick: ['items'],
   },
 });

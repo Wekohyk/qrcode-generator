@@ -16,6 +16,7 @@ function sourceOf(ua: string | null): ScanSource {
 }
 
 onMounted(async () => {
+  await codes.load();
   const events: { at: number; source: ScanSource }[] = [];
   let total = 0;
   await Promise.all(

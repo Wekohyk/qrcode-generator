@@ -14,12 +14,6 @@ import {
   type QrKind,
 } from '@/types/code';
 import { contentError, httpUrl, previewPayload } from '@/utils/payload';
-import {
-  createLiveCode,
-  patchLiveCode,
-  toLivePayload,
-  toLiveType,
-} from '@/api/live';
 import { downloadQr } from '@/composables/useQr';
 import { readImageFile } from '@/utils/image';
 import EmptyState from '@/components/ui/EmptyState.vue';
@@ -30,6 +24,7 @@ const route = useRoute();
 const router = useRouter();
 const codes = useCodesStore();
 const settings = useSettingsStore();
+void codes.load();
 
 const kinds: { id: QrKind; label: string }[] = [
   { id: 'url', label: 'URL' },
@@ -156,6 +151,7 @@ function applyRoute() {
   const found = codes.items.find(item => item.id === String(route.params.id));
   if (!found) {
     missing.value = true;
+    if (codes.loadError) error.value = codes.loadError;
     return;
   }
   draft.value = {
@@ -168,10 +164,11 @@ function applyRoute() {
 }
 
 watch(
-  () => route.fullPath,
+  () => [route.fullPath, codes.ready] as const,
   () => {
     error.value = '';
     savedHint.value = false;
+    if (route.name === 'code-edit' && !codes.ready) return;
     applyRoute();
   },
   { immediate: true },
@@ -286,42 +283,18 @@ async function save() {
     fields: { ...draft.value.fields },
     style: { ...draft.value.style },
   };
-  let link = current.value?.remoteId
-    ? {
-        remoteId: current.value.remoteId,
-        shortKey: current.value.shortKey || '',
-        scanUrl: current.value.scanUrl || '',
-      }
-    : undefined;
-  if (isLive(next.kind, next.mode)) {
-    const body = {
-      type: toLiveType(next.kind),
-      title: next.name.trim(),
-      payload: toLivePayload(next.kind, next.fields),
-    };
-    try {
-      if (link?.remoteId) {
-        await patchLiveCode(link.remoteId, body);
-      } else {
-        const created = await createLiveCode(body);
-        link = {
-          remoteId: created.id,
-          shortKey: created.short_key,
-          scanUrl: created.scan_url,
-        };
-      }
-    } catch (reason) {
-      error.value =
-        reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
-      savedHint.value = false;
-      return;
+  try {
+    if (!savedId.value) {
+      const created = await codes.create(next);
+      await router.replace({ name: 'code-edit', params: { id: created.id } });
+    } else {
+      await codes.update(savedId.value, next);
     }
-  }
-  if (!savedId.value) {
-    const created = codes.create(next, link);
-    await router.replace({ name: 'code-edit', params: { id: created.id } });
-  } else {
-    codes.update(savedId.value, next, link);
+  } catch (reason) {
+    error.value =
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
+    savedHint.value = false;
+    return;
   }
   savedHint.value = true;
   window.setTimeout(() => {
@@ -369,7 +342,7 @@ async function togglePause() {
     );
   } catch (reason) {
     error.value =
-      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
   }
 }
 </script>
@@ -405,10 +378,17 @@ async function togglePause() {
     <div v-if="missing" class="panel flex flex-1 items-center justify-center">
       <EmptyState
         title="找不到这个码"
-        description="它可能已经删除。"
+        :description="codes.loadError || '它可能已经删除。'"
         action="返回列表"
         @action="router.push({ name: 'codes' })"
       />
+    </div>
+
+    <div
+      v-else-if="route.name === 'code-edit' && !codes.ready"
+      class="panel flex flex-1 items-center justify-center text-14px text-text-secondary"
+    >
+      正在读取
     </div>
 
     <div

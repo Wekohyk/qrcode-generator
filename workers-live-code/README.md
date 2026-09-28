@@ -16,7 +16,7 @@ cd workers-live-code
 npm i
 npx wrangler d1 create weko-qr   # 把返回的 database_id 填进 wrangler.toml
 npm run db:init:local
-npm run dev
+npm run dev·
 ```
 
 管理后台通过 Vite 把 `/live` 代理到 `http://127.0.0.1:8787`。活码二维码只编码返回的 `scan_url`。

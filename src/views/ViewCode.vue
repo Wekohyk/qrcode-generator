@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCodesStore } from '@/store/modules/codes';
 import { buildStaticPayload } from '@/utils/payload';
@@ -7,6 +7,7 @@ import type { ScanSource } from '@/types/code';
 
 const route = useRoute();
 const codes = useCodesStore();
+void codes.load();
 
 const code = computed(() =>
   codes.items.find(item => item.id === String(route.params.id || '')),
@@ -24,15 +25,20 @@ function sourceOf(): ScanSource {
   return 'direct';
 }
 
-onMounted(() => {
-  const current = code.value;
-  if (!current || current.status === 'paused' || current.mode !== 'live')
-    return;
-  const key = `inkcode-scan-${current.id}`;
-  if (sessionStorage.getItem(key)) return;
-  sessionStorage.setItem(key, '1');
-  codes.addScan(current.id, sourceOf());
-});
+watch(
+  () => codes.ready,
+  ready => {
+    if (!ready) return;
+    const current = code.value;
+    if (!current || current.status === 'paused' || current.mode !== 'live')
+      return;
+    const key = `inkcode-scan-${current.id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    codes.addScan(current.id, sourceOf());
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -41,7 +47,10 @@ onMounted(() => {
   >
     <article class="panel w-full max-w-420px px-24px py-24px">
       <p class="text-12px text-text-muted">Weko QR Code</p>
-      <template v-if="!code">
+      <template v-if="!codes.ready">
+        <h1 class="mt-12px text-20px font-semibold">正在读取</h1>
+      </template>
+      <template v-else-if="!code">
         <h1 class="mt-12px text-20px font-semibold">这个码不存在</h1>
         <p class="mt-8px text-14px text-text-secondary">它可能已经删除。</p>
       </template>

@@ -27,6 +27,7 @@ const createKinds: { id: QrKind; label: string }[] = [
 ];
 
 onMounted(async () => {
+  await codes.load();
   await Promise.all(
     codes.items
       .filter(item => item.remoteId)
@@ -103,7 +104,7 @@ async function pause() {
     notice.value = '';
   } catch (reason) {
     notice.value =
-      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
   }
 }
 
@@ -118,15 +119,20 @@ async function resume() {
     notice.value = '';
   } catch (reason) {
     notice.value =
-      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
   }
 }
 
 async function remove() {
   if (!window.confirm(`删除选中的 ${selected.value.length} 个码？`)) return;
-  await codes.remove(selected.value);
-  selected.value = [];
-  notice.value = '';
+  try {
+    await codes.remove(selected.value);
+    selected.value = [];
+    notice.value = '';
+  } catch (reason) {
+    notice.value =
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
+  }
 }
 
 function create(kind: QrKind) {
@@ -159,8 +165,13 @@ async function copyItem(item: QrCode) {
 async function removeOne(item: QrCode) {
   menuId.value = '';
   if (!window.confirm(`删除「${item.name}」？`)) return;
-  await codes.remove([item.id]);
-  selected.value = selected.value.filter(id => id !== item.id);
+  try {
+    await codes.remove([item.id]);
+    selected.value = selected.value.filter(id => id !== item.id);
+  } catch (reason) {
+    notice.value =
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
+  }
 }
 
 async function toggleOne(item: QrCode) {
@@ -177,7 +188,7 @@ async function toggleOne(item: QrCode) {
     notice.value = '';
   } catch (reason) {
     notice.value =
-      reason instanceof Error ? reason.message : '活码服务没有完成这次请求';
+      reason instanceof Error ? reason.message : '后端没有完成这次请求';
   }
 }
 </script>
@@ -273,7 +284,19 @@ async function toggleOne(item: QrCode) {
     </div>
     <p v-if="notice" class="mb-8px text-12px text-accent-deep">{{ notice }}</p>
 
-    <div v-if="!codes.items.length" class="min-h-0 flex-1">
+    <div
+      v-if="!codes.ready"
+      class="min-h-0 flex-1 px-12px py-20px text-14px text-text-secondary"
+    >
+      正在读取
+    </div>
+    <div
+      v-else-if="codes.loadError"
+      class="min-h-0 flex-1 px-12px py-20px text-14px text-text-secondary"
+    >
+      {{ codes.loadError }}
+    </div>
+    <div v-else-if="!codes.items.length" class="min-h-0 flex-1">
       <EmptyState
         title="还没有二维码"
         description="新建后会出现在这里。"

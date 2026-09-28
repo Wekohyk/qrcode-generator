@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "weko-qr"
-database_id = "00000000-0000-0000-0000-000000000000" # replace after: wrangler d1 create weko-qr
+database_id = "1e96c49b-9916-4f36-b49e-52f4ee60ccc2"
 
 # Optional: bind a custom domain for short links, e.g. q.example.com
 # routes = [{ pattern = "q.example.com/*", zone_name = "example.com" }]

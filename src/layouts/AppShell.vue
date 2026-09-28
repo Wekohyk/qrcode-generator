@@ -3,9 +3,11 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Icon from '@/components/Icon.vue';
 import CommandPalette from '@/components/CommandPalette.vue';
+import { useCodesStore } from '@/store/modules/codes';
 
 const route = useRoute();
 const paletteOpen = ref(false);
+void useCodesStore().load();
 
 const nav = [
   { to: '/', label: '工作台', icon: 'home' },

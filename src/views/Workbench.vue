@@ -65,7 +65,13 @@ function payload(id: string) {
           全部
         </RouterLink>
       </div>
-      <div v-if="!recent.length" class="panel px-16px py-20px">
+      <div v-if="!codes.ready" class="panel px-16px py-20px">
+        <p class="text-14px text-text-secondary">正在读取</p>
+      </div>
+      <div v-else-if="codes.loadError" class="panel px-16px py-20px">
+        <p class="text-14px text-text-secondary">{{ codes.loadError }}</p>
+      </div>
+      <div v-else-if="!recent.length" class="panel px-16px py-20px">
         <p class="text-14px text-text-secondary">
           还没有码。从上面选一种内容开始。
         </p>
