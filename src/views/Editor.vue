@@ -385,7 +385,7 @@ async function togglePause() {
             v-for="item in kinds"
             :key="item.id"
             type="text"
-            class="kind-btn"
+            class="kind-btn hover:bg-#e5f4eb!"
             :class="{ 'is-on': draft.kind === item.id }"
             @click="onKind(item.id)"
           >
