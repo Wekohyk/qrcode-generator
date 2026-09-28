@@ -233,10 +233,10 @@ async function toggleOne(item: QrCode) {
         </button>
         <div
           :class="[
-            'absolute right-0 top-44px z-20 w-160px rounded-14px border border-border-glass bg-white/95 p-6px shadow-[0_10px_30px_rgba(36,90,58,0.12)] duration-300 ease-in-out transition-all',
+            'absolute right-0 top-44px w-160px rounded-14px border border-border-glass bg-white/95 p-6px shadow-[0_10px_30px_rgba(36,90,58,0.12)] duration-300 ease-in-out transition-all',
             createOpen
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-10',
+              ? 'opacity-100 translate-y-0 z-999'
+              : 'opacity-0 translate-y-10 -z-999',
           ]"
         >
           <button
